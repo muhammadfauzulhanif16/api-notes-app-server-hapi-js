@@ -1,0 +1,43 @@
+{
+  "name": "api-notes-app-server-hapi-js",
+  "author": "Muhammad Fauzul Hanif <muhammadfauzulhanif2230511102@ummi.ac.id>",
+  "contributors": [
+    "Muhammad Fauzul Hanif <muhammadfauzulhanif2230511102@ummi.ac.id>"
+  ],
+  "version": "1.0.0",
+  "license": "ISC",
+  "keywords": [
+    "api",
+    "notes",
+    "app",
+    "server",
+    "hapi",
+    "js"
+  ],
+  "description": "API for notes app server with Hapi JS",
+  "scripts": {
+    "start-prod": "NODE_ENV=production node ./src/server.js",
+    "start-dev": "nodemon ./src/server.js",
+    "lint": "eslint ./src",
+    "migrate": "node-pg-migrate"
+  },
+  "dependencies": {
+    "@hapi/hapi": "^21.3.0",
+    "@hapi/jwt": "^3.2.0",
+    "bcrypt": "^5.1.0",
+    "dotenv": "^16.0.3",
+    "joi": "^17.9.1",
+    "node-pg-migrate": "^6.2.2",
+    "pg": "^8.10.0",
+    "uuid": "^9.0.0"
+  },
+  "devDependencies": {
+    "eslint": "^8.36.0",
+    "eslint-config-standard": "^17.0.0",
+    "eslint-plugin-import": "^2.27.5",
+    "eslint-plugin-n": "^15.6.1",
+    "eslint-plugin-promise": "^6.1.1",
+    "nodemon": "^2.0.22",
+    "prettier": "^2.8.6"
+  }
+}
