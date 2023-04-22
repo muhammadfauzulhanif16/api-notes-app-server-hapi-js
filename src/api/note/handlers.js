@@ -38,11 +38,14 @@ exports.NoteHandlers = (service, validator) => {
 
   const editNoteById = async (req) => {
     validator.validateNotePayload(req.payload)
-    await service.getNoteById(req.params.id, req.payload)
+    const note = await service.editNoteById(req.params.id, req.payload)
 
     return {
       status: 'success',
-      message: 'Catatan berhasil diperbarui'
+      message: 'Catatan berhasil diperbarui',
+      data: {
+        note
+      }
     }
   }
 
