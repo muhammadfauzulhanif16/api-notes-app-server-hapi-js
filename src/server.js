@@ -1,5 +1,6 @@
 require('dotenv').config()
 const Hapi = require('@hapi/hapi')
+const Jwt = require('@hapi/jwt')
 
 const { Note } = require('./api/note')
 const { NoteValidator } = require('./validator/note')
@@ -14,19 +15,41 @@ const { AuthenticationValidator } = require('./validator/authentication')
 const {
   AuthenticationServices
 } = require('./services/postgre/AuthenticationServices')
-const TokenManager = require('./tokenize/TokenManager')
 
+const { TokenManager } = require('./tokenize/TokenManager')
 const { ClientError } = require('./exceptions')
 
 const init = async () => {
   const server = Hapi.server({
     port: process.env.PORT,
-    host: process.env.NODE_ENV !== 'production' ? 'localhost' : '0.0.0.0',
+    host: process.env.HOST,
     routes: {
       cors: {
         origin: ['*']
       }
     }
+  })
+
+  await server.register([
+    {
+      plugin: Jwt.plugin
+    }
+  ])
+
+  server.auth.strategy('notes_app_jwt', 'jwt', {
+    keys: process.env.ACCESS_TOKEN_KEY,
+    verify: {
+      aud: false,
+      iss: false,
+      sub: false,
+      maxAgeSec: process.env.ACCESS_TOKEN_AGE
+    },
+    validate: (artifacts) => ({
+      isValid: true,
+      credentials: {
+        id: artifacts.decoded.payload.id
+      }
+    })
   })
 
   await server.register([

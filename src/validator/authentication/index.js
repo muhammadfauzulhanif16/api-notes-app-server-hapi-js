@@ -1,17 +1,17 @@
 const {
-  PostAuthenticationPayloadSchema,
-  PutAuthenticationPayloadSchema,
+  AddAuthenticationPayloadSchema,
+  EditAuthenticationPayloadSchema,
   DeleteAuthenticationPayloadSchema
 } = require('./schema')
-const InvariantError = require('../../exceptions/InvariantError')
+const { InvariantError } = require('../../exceptions')
 
 exports.AuthenticationValidator = {
-  validatePostAuthenticationPayload: (payload) => {
-    const { error } = PostAuthenticationPayloadSchema.validate(payload)
+  validateAddAuthenticationPayload: (payload) => {
+    const { error } = AddAuthenticationPayloadSchema.validate(payload)
     if (error) throw new InvariantError(error.message)
   },
-  validatePutAuthenticationPayload: (payload) => {
-    const { error } = PutAuthenticationPayloadSchema.validate(payload)
+  validateEditAuthenticationPayload: (payload) => {
+    const { error } = EditAuthenticationPayloadSchema.validate(payload)
     if (error) throw new InvariantError(error.message)
   },
   validateDeleteAuthenticationPayload: (payload) => {

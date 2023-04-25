@@ -1,21 +1,21 @@
 exports.UserHandlers = (service, validator) => {
-  const postUserHandler = async (req, h) => {
+  const addUser = async (req, h) => {
     validator.validateUserPayload(req.payload)
-    const userId = await service.postUserService(req.payload)
+    const id = await service.addUser(req.payload)
 
     return h
       .response({
         status: 'success',
         message: 'User berhasil ditambahkan',
         data: {
-          userId
+          id
         }
       })
       .code(201)
   }
 
-  const getUserByIdHandler = async (req) => {
-    const user = await service.getUserByIdService(req.params.id)
+  const getUserById = async (req) => {
+    const user = await service.getUserById(req.params.id)
 
     return {
       status: 'success',
@@ -26,7 +26,7 @@ exports.UserHandlers = (service, validator) => {
   }
 
   return {
-    postUserHandler,
-    getUserByIdHandler
+    addUser,
+    getUserById
   }
 }

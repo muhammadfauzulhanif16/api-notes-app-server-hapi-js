@@ -1,11 +1,11 @@
 const Joi = require('joi')
 
-exports.PostAuthenticationPayloadSchema = Joi.object({
+exports.AddAuthenticationPayloadSchema = Joi.object({
   username: Joi.string().required(),
   password: Joi.string().required()
 })
 
-exports.PutAuthenticationPayloadSchema = Joi.object({
+exports.EditAuthenticationPayloadSchema = Joi.object({
   refreshToken: Joi.string().required()
 })
 

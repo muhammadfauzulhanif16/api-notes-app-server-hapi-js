@@ -11,8 +11,8 @@ const {
 exports.UserServices = () => {
   const pool = new Pool()
 
-  const postUserService = async ({ fullName, username, password }) => {
-    await verifyNewUsernameService(username)
+  const addUser = async ({ fullName, username, password }) => {
+    await verifyNewUsername(username)
 
     const id = uuid.v4()
     const hashedPassword = await bcrypt.hash(password, 10)
@@ -30,7 +30,7 @@ exports.UserServices = () => {
     return user.rows[0].id
   }
 
-  const verifyNewUsernameService = async (username) => {
+  const verifyNewUsername = async (username) => {
     const user = await pool.query({
       text: 'SELECT username FROM users WHERE username = $1',
       values: [username]
@@ -43,7 +43,7 @@ exports.UserServices = () => {
     }
   }
 
-  const getUserByIdService = async (id) => {
+  const getUserById = async (id) => {
     const user = await pool.query({
       text: 'SELECT * FROM users WHERE id = $1',
       values: [id]
@@ -56,19 +56,19 @@ exports.UserServices = () => {
     return user.rows[0]
   }
 
-  const verifyUserCredentialService = async (username, password) => {
+  const verifyUserCredential = async (username, password) => {
     const user = await pool.query({
       text: 'SELECT id, password FROM users WHERE username = $1',
       values: [username]
     })
 
-    if (!user.rowCount) {
+    if (!user.rows.length) {
       throw new AuthenticationError('Kredensial yang Anda berikan salah')
     }
 
     const { id, password: hashedPassword } = user.rows[0]
     const isValid = await bcrypt.compare(password, hashedPassword)
-
+    0
     if (!isValid) {
       throw new AuthenticationError('Kredensial yang Anda berikan salah')
     }
@@ -77,9 +77,9 @@ exports.UserServices = () => {
   }
 
   return {
-    postUserService,
-    verifyNewUsernameService,
-    getUserByIdService,
-    verifyUserCredentialService
+    addUser,
+    verifyNewUsername,
+    getUserById,
+    verifyUserCredential
   }
 }

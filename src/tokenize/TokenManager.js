@@ -1,3 +1,4 @@
+require('dotenv').config()
 const Jwt = require('@hapi/jwt')
 const { InvariantError } = require('../exceptions')
 
