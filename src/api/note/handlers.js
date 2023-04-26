@@ -29,7 +29,7 @@ exports.NoteHandlers = (service, validator) => {
 
   const getNoteById = async (req) => {
     const { id: credentialId } = req.auth.credentials
-    await service.verifyNoteOwner(req.params.id, credentialId)
+    await service.verifyNoteAccess(req.params.id, credentialId)
     const note = await service.getNoteById(req.params.id)
 
     return {
@@ -43,7 +43,7 @@ exports.NoteHandlers = (service, validator) => {
   const editNoteById = async (req) => {
     validator.validateNotePayload(req.payload)
     const { id: credentialId } = req.auth.credentials
-    await service.verifyNoteOwner(req.params.id, credentialId)
+    await service.verifyNoteAccess(req.params.id, credentialId)
     const note = await service.editNoteById(req.params.id, req.payload)
 
     return {

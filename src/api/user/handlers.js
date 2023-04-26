@@ -25,8 +25,20 @@ exports.UserHandlers = (service, validator) => {
     }
   }
 
+  const getUsersByUsername = async (req) => {
+    const users = await service.getUsersByUsername(req.query.username)
+
+    return {
+      status: 'success',
+      data: {
+        users
+      }
+    }
+  }
+
   return {
     addUser,
-    getUserById
+    getUserById,
+    getUsersByUsername
   }
 }

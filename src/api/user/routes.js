@@ -8,5 +8,10 @@ exports.UserRoutes = (handler) => [
     method: 'GET',
     path: '/users/{id}',
     handler: (req, h) => handler.getUserById(req, h)
+  },
+  {
+    method: 'GET',
+    path: '/users',
+    handler: (req, h) => handler.getUsersByUsername(req, h)
   }
 ]

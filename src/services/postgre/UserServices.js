@@ -73,10 +73,20 @@ exports.UserServices = () => {
     return id
   }
 
+  const getUsersByUsername = async (username) => {
+    const result = await pool.query(
+      'SELECT id, username, full_name FROM users WHERE username LIKE $1',
+      [`%${username}%`]
+    )
+
+    return result.rows
+  }
+
   return {
     addUser,
     verifyNewUsername,
     getUserById,
-    verifyUserCredential
+    verifyUserCredential,
+    getUsersByUsername
   }
 }

@@ -4,12 +4,14 @@ exports.mapDBToNoteModel = ({
   body,
   tags,
   created_at: createdAt,
-  updated_at: updatedAt
+  updated_at: updatedAt,
+  username
 }) => ({
   id,
   title,
   body,
   tags,
   createdAt,
-  updatedAt
+  updatedAt,
+  username
 })

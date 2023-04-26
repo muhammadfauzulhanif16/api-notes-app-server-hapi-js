@@ -7,7 +7,7 @@ const {
   AuthorizationError
 } = require('../../exceptions')
 
-exports.NoteServices = () => {
+exports.NoteServices = (collaborationService) => {
   const pool = new Pool()
 
   const addNote = async ({ title, body, tags }, owner) => {
@@ -27,15 +27,19 @@ exports.NoteServices = () => {
   }
 
   const getNotes = async (owner) => {
-    const notes = await pool.query('SELECT * FROM notes WHERE owner = $1', [
-      owner
-    ])
+    const notes = await pool.query(
+      'SELECT notes.* FROM notes LEFT JOIN collaborations ON collaborations.note_id = notes.id WHERE notes.owner = $1 OR collaborations.user_id = $1 GROUP BY notes.id',
+      [owner]
+    )
 
     return notes.rows.map(mapDBToNoteModel)
   }
 
   const getNoteById = async (id) => {
-    const note = await pool.query('SELECT * FROM notes WHERE id = $1', [id])
+    const note = await pool.query(
+      'SELECT notes.*, users.username FROM notes LEFT JOIN users ON users.id = notes.owner WHERE notes.id = $1',
+      [id]
+    )
 
     if (!note.rows.length) {
       throw new NotFoundError('Catatan tidak ditemukan')
@@ -83,12 +87,29 @@ exports.NoteServices = () => {
     }
   }
 
+  const verifyNoteAccess = async (noteId, userId) => {
+    try {
+      await verifyNoteOwner(noteId, userId)
+    } catch (error) {
+      if (error instanceof NotFoundError) {
+        throw error
+      }
+
+      try {
+        await collaborationService.verifyCollaborator(noteId, userId)
+      } catch {
+        throw error
+      }
+    }
+  }
+
   return {
     addNote,
     getNotes,
     getNoteById,
     editNoteById,
     deleteNoteById,
-    verifyNoteOwner
+    verifyNoteOwner,
+    verifyNoteAccess
   }
 }
