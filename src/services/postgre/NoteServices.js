@@ -1,19 +1,23 @@
 const { Pool } = require('pg')
 const uuid = require('uuid')
 const { mapDBToNoteModel } = require('../../utils')
-const { InvariantError, NotFoundError } = require('../../exceptions')
+const {
+  InvariantError,
+  NotFoundError,
+  AuthorizationError
+} = require('../../exceptions')
 
 exports.NoteServices = () => {
   const pool = new Pool()
 
-  const addNote = async ({ title, body, tags }) => {
+  const addNote = async ({ title, body, tags }, owner) => {
     const id = uuid.v4()
     const createdAt = new Date()
 
-    const note = await pool.query({
-      text: 'INSERT INTO notes VALUES($1, $2, $3, $4, $5, $6) RETURNING id',
-      values: [id, title, body, tags, createdAt, createdAt]
-    })
+    const note = await pool.query(
+      'INSERT INTO notes VALUES($1, $2, $3, $4, $5, $6, $7) RETURNING id',
+      [id, title, body, tags, createdAt, createdAt, owner]
+    )
 
     if (!note.rows[0].id) {
       throw new InvariantError('Catatan gagal ditambahkan')
@@ -22,17 +26,16 @@ exports.NoteServices = () => {
     return note.rows[0].id
   }
 
-  const getNotes = async () => {
-    const notes = await pool.query('SELECT * FROM notes')
+  const getNotes = async (owner) => {
+    const notes = await pool.query('SELECT * FROM notes WHERE owner = $1', [
+      owner
+    ])
 
     return notes.rows.map(mapDBToNoteModel)
   }
 
   const getNoteById = async (id) => {
-    const note = await pool.query({
-      text: 'SELECT * FROM notes WHERE id = $1',
-      values: [id]
-    })
+    const note = await pool.query('SELECT * FROM notes WHERE id = $1', [id])
 
     if (!note.rows.length) {
       throw new NotFoundError('Catatan tidak ditemukan')
@@ -44,10 +47,10 @@ exports.NoteServices = () => {
   const editNoteById = async (id, { title, body, tags }) => {
     const updatedAt = new Date()
 
-    const note = await pool.query({
-      text: 'UPDATE notes SET title = $1, body = $2, tags = $3, updated_at = $4 WHERE id = $5 RETURNING id',
-      values: [title, body, tags, updatedAt, id]
-    })
+    const note = await pool.query(
+      'UPDATE notes SET title = $1, body = $2, tags = $3, updated_at = $4 WHERE id = $5 RETURNING id',
+      [title, body, tags, updatedAt, id]
+    )
 
     if (!note.rows.length) {
       throw new NotFoundError('Gagal memperbarui catatan. Id tidak ditemukan')
@@ -55,13 +58,28 @@ exports.NoteServices = () => {
   }
 
   const deleteNoteById = async (id) => {
-    const note = await pool.query({
-      text: 'DELETE FROM notes WHERE id = $1 RETURNING id',
-      values: [id]
-    })
+    const note = await pool.query(
+      'DELETE FROM notes WHERE id = $1 RETURNING id',
+      [id]
+    )
 
     if (!note.rows.length) {
       throw new NotFoundError('Catatan gagal dihapus. Id tidak ditemukan')
+    }
+  }
+
+  const verifyNoteOwner = async (id, owner) => {
+    const result = await pool.query(
+      'SELECT * FROM notes WHERE id = $1 AND owner = $2',
+      [id, owner]
+    )
+
+    if (!result.rows.length) {
+      throw new NotFoundError('Catatan tidak ditemukan')
+    }
+
+    if (result.rows[0].owner !== owner) {
+      throw new AuthorizationError('Anda tidak berhak mengakses resource ini')
     }
   }
 
@@ -70,6 +88,7 @@ exports.NoteServices = () => {
     getNotes,
     getNoteById,
     editNoteById,
-    deleteNoteById
+    deleteNoteById,
+    verifyNoteOwner
   }
 }
