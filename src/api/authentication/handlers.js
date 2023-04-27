@@ -1,16 +1,19 @@
 exports.AuthenticationHandlers = (
-  authenticationService,
-  userService,
+  authenticationServices,
+  userServices,
   tokenManager,
   validator
 ) => {
   const addAuthentication = async (req, h) => {
     validator.validateAddAuthenticationPayload(req.payload)
-    const { username, password } = req.payload
-    const id = await userService.verifyUserCredential(username, password)
+
+    const id = await userServices.verifyUserCredential(
+      req.payload.username,
+      req.payload.password
+    )
     const accessToken = tokenManager.generateAccessToken({ id })
     const refreshToken = tokenManager.generateRefreshToken({ id })
-    await authenticationService.addRefreshToken(refreshToken)
+    await authenticationServices.addRefreshToken(refreshToken)
 
     return h
       .response({
@@ -26,7 +29,8 @@ exports.AuthenticationHandlers = (
 
   const editAuthentication = async (req) => {
     validator.validateEditAuthenticationPayload(req.payload)
-    await authenticationService.verifyRefreshToken(req.payload.refreshToken)
+
+    await authenticationServices.verifyRefreshToken(req.payload.refreshToken)
     const { id } = tokenManager.verifyRefreshToken(req.payload.refreshToken)
     const accessToken = tokenManager.generateAccessToken({ id })
 
@@ -41,8 +45,9 @@ exports.AuthenticationHandlers = (
 
   const deleteAuthentication = async (req) => {
     validator.validateDeleteAuthenticationPayload(req.payload)
-    await authenticationService.verifyRefreshToken(req.payload.refreshToken)
-    await authenticationService.deleteRefreshToken(req.payload.refreshToken)
+
+    await authenticationServices.verifyRefreshToken(req.payload.refreshToken)
+    await authenticationServices.deleteRefreshToken(req.payload.refreshToken)
 
     return {
       status: 'success',

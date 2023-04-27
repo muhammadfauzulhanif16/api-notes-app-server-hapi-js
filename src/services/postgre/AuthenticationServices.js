@@ -14,12 +14,13 @@ exports.AuthenticationServices = () => {
       [token]
     )
 
-    if (!result.rows.length) {
+    if (!result.rowCount) {
       throw new InvariantError('Refresh token tidak valid')
     }
   }
 
   const deleteRefreshToken = async (token) => {
+    await verifyRefreshToken(token)
     await pool.query('DELETE FROM authentications WHERE token = $1', [token])
   }
 

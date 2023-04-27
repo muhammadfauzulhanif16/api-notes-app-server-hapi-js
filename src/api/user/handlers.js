@@ -1,7 +1,8 @@
-exports.UserHandlers = (service, validator) => {
+exports.UserHandlers = (services, validator) => {
   const addUser = async (req, h) => {
     validator.validateUserPayload(req.payload)
-    const id = await service.addUser(req.payload)
+
+    const id = await services.addUser(req.payload)
 
     return h
       .response({
@@ -15,7 +16,7 @@ exports.UserHandlers = (service, validator) => {
   }
 
   const getUserById = async (req) => {
-    const user = await service.getUserById(req.params.id)
+    const user = await services.getUserById(req.params.id)
 
     return {
       status: 'success',
@@ -26,7 +27,7 @@ exports.UserHandlers = (service, validator) => {
   }
 
   const getUsersByUsername = async (req) => {
-    const users = await service.getUsersByUsername(req.query.username)
+    const users = await services.getUsersByUsername(req.query.username)
 
     return {
       status: 'success',

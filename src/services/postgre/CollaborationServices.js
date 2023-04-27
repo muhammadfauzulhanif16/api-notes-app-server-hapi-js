@@ -6,7 +6,7 @@ exports.CollaborationServices = () => {
   const pool = new Pool()
 
   const addCollaboration = async (noteId, userId) => {
-    const id = `collab-${uuid.v4()}`
+    const id = uuid.v4()
 
     const result = await pool.query(
       'INSERT INTO collaborations VALUES($1, $2, $3) RETURNING id',
@@ -22,7 +22,7 @@ exports.CollaborationServices = () => {
 
   const deleteCollaboration = async (noteId, userId) => {
     const result = await pool.query(
-      'DELETE FROM collaborations WHERE note_id = $1 AND user_id = $2',
+      'DELETE FROM collaborations WHERE note_id = $1 AND user_id = $2 RETURNING id',
       [noteId, userId]
     )
 

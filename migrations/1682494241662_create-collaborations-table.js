@@ -2,7 +2,7 @@ exports.up = (pgm) => {
   // membuat table collaborations
   pgm.createTable('collaborations', {
     id: {
-      type: 'CHAR(43)',
+      type: 'CHAR(36)',
       primaryKey: true
     },
     note_id: {
@@ -38,7 +38,6 @@ exports.up = (pgm) => {
   )
 }
 
-exports.down = (pgm) => {
+exports.down = (pgm) =>
   // menghapus tabel collaborations
   pgm.dropTable('collaborations')
-}
