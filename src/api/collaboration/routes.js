@@ -4,7 +4,7 @@ exports.CollaborationRoutes = (handlers) => [
     path: '/collaborations',
     handler: (req, h) => handlers.addCollaboration(req, h),
     options: {
-      auth: 'notes_app_jwt'
+      auth: 'notes'
     }
   },
   {
@@ -12,7 +12,7 @@ exports.CollaborationRoutes = (handlers) => [
     path: '/collaborations',
     handler: (req, h) => handlers.deleteCollaboration(req, h),
     options: {
-      auth: 'notes_app_jwt'
+      auth: 'notes'
     }
   }
 ]

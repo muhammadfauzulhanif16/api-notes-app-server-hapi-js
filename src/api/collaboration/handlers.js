@@ -6,10 +6,7 @@ exports.CollaborationHandlers = (
   const addCollaboration = async (req, h) => {
     validator.validateCollaborationPayload(req.payload)
 
-    await noteServices.verifyNoteOwner(
-      req.payload.noteId,
-      req.auth.credentials.id
-    )
+    await noteServices.verifyOwner(req.payload.noteId, req.auth.credentials.id)
     const id = await collaborationServices.addCollaboration(
       req.payload.noteId,
       req.payload.userId
@@ -29,10 +26,7 @@ exports.CollaborationHandlers = (
   const deleteCollaboration = async (req) => {
     validator.validateCollaborationPayload(req.payload)
 
-    await noteServices.verifyNoteOwner(
-      req.payload.noteId,
-      req.auth.credentials.id
-    )
+    await noteServices.verifyOwner(req.payload.noteId, req.auth.credentials.id)
     await collaborationServices.deleteCollaboration(
       req.payload.noteId,
       req.payload.userId

@@ -4,7 +4,7 @@ exports.NoteRoutes = (handlers) => [
     path: '/notes',
     handler: (req, h) => handlers.addNote(req, h),
     options: {
-      auth: 'notes_app_jwt'
+      auth: 'notes'
     }
   },
   {
@@ -12,7 +12,7 @@ exports.NoteRoutes = (handlers) => [
     path: '/notes',
     handler: (req, h) => handlers.getNotes(req, h),
     options: {
-      auth: 'notes_app_jwt'
+      auth: 'notes'
     }
   },
   {
@@ -20,7 +20,7 @@ exports.NoteRoutes = (handlers) => [
     path: '/notes/{id}',
     handler: (req, h) => handlers.getNoteById(req, h),
     options: {
-      auth: 'notes_app_jwt'
+      auth: 'notes'
     }
   },
   {
@@ -28,7 +28,7 @@ exports.NoteRoutes = (handlers) => [
     path: '/notes/{id}',
     handler: (req, h) => handlers.editNoteById(req, h),
     options: {
-      auth: 'notes_app_jwt'
+      auth: 'notes'
     }
   },
   {
@@ -36,7 +36,7 @@ exports.NoteRoutes = (handlers) => [
     path: '/notes/{id}',
     handler: (req, h) => handlers.deleteNoteById(req, h),
     options: {
-      auth: 'notes_app_jwt'
+      auth: 'notes'
     }
   }
 ]

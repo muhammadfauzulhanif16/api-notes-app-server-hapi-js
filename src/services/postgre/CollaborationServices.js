@@ -3,12 +3,10 @@ const uuid = require('uuid')
 const { InvariantError } = require('../../exceptions')
 
 exports.CollaborationServices = () => {
-  const pool = new Pool()
-
   const addCollaboration = async (noteId, userId) => {
     const id = uuid.v4()
 
-    const result = await pool.query(
+    const result = await new Pool().query(
       'INSERT INTO collaborations VALUES($1, $2, $3) RETURNING id',
       [id, noteId, userId]
     )
@@ -21,7 +19,7 @@ exports.CollaborationServices = () => {
   }
 
   const deleteCollaboration = async (noteId, userId) => {
-    const result = await pool.query(
+    const result = await new Pool().query(
       'DELETE FROM collaborations WHERE note_id = $1 AND user_id = $2 RETURNING id',
       [noteId, userId]
     )
@@ -32,7 +30,7 @@ exports.CollaborationServices = () => {
   }
 
   const verifyCollaborator = async (noteId, userId) => {
-    const result = await pool.query(
+    const result = await new Pool().query(
       'SELECT * FROM collaborations WHERE note_id = $1 AND user_id = $2',
       [noteId, userId]
     )

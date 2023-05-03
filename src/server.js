@@ -2,34 +2,30 @@ require('dotenv').config()
 const Hapi = require('@hapi/hapi')
 const Jwt = require('@hapi/jwt')
 
-const { Note } = require('./api/note')
-const { NoteValidator } = require('./validator/note')
-const { NoteServices } = require('./services/postgre/NoteServices')
-
-const { User } = require('./api/user')
-const { UserValidator } = require('./validator/user')
-const { UserServices } = require('./services/postgre/UserServices')
-
-const { Authentication } = require('./api/authentication')
-const { AuthenticationValidator } = require('./validator/authentication')
+const { Note, User, Collaboration, Authentication, Export } = require('./api')
 const {
-  AuthenticationServices
-} = require('./services/postgre/AuthenticationServices')
-
-const { Collaboration } = require('./api/collaboration')
+  NoteValidator,
+  UserValidator,
+  AuthenticationValidator,
+  CollaborationValidator,
+  ExportValidator
+} = require('./validator')
 const {
-  CollaborationServices
-} = require('./services/postgre/CollaborationServices')
-const { CollaborationValidator } = require('./validator/collaboration')
+  NoteServices,
+  AuthenticationServices,
+  CollaborationServices,
+  UserServices,
+  ProducerServices
+} = require('./services')
 
 const { TokenManager } = require('./tokenize/TokenManager')
 const { ClientError } = require('./exceptions')
 
 const init = async () => {
-  const collaborationServices = CollaborationServices()
-  const noteServices = NoteServices(collaborationServices)
   const userServices = UserServices()
   const authenticationServices = AuthenticationServices()
+  const collaborationServices = CollaborationServices()
+  const noteServices = NoteServices(collaborationServices)
 
   const server = Hapi.server({
     port: process.env.PORT,
@@ -47,7 +43,7 @@ const init = async () => {
     }
   ])
 
-  server.auth.strategy('notes_app_jwt', 'jwt', {
+  server.auth.strategy('notes', 'jwt', {
     keys: process.env.ACCESS_TOKEN_KEY,
     verify: {
       aud: false,
@@ -64,13 +60,6 @@ const init = async () => {
   })
 
   await server.register([
-    {
-      plugin: Note,
-      options: {
-        services: noteServices,
-        validator: NoteValidator
-      }
-    },
     {
       plugin: User,
       options: {
@@ -93,6 +82,20 @@ const init = async () => {
         collaborationServices,
         noteServices,
         validator: CollaborationValidator
+      }
+    },
+    {
+      plugin: Note,
+      options: {
+        services: noteServices,
+        validator: NoteValidator
+      }
+    },
+    {
+      plugin: Export,
+      options: {
+        services: ProducerServices,
+        validator: ExportValidator
       }
     }
   ])

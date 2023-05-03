@@ -1,4 +1,4 @@
-exports.up = (pgm) => {
+exports.up = (pgm) =>
   pgm.createTable('users', {
     id: {
       type: 'CHAR(36)',
@@ -27,6 +27,5 @@ exports.up = (pgm) => {
       notNull: true
     }
   })
-}
 
 exports.down = (pgm) => pgm.dropTable('users')

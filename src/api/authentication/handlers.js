@@ -7,12 +7,13 @@ exports.AuthenticationHandlers = (
   const addAuthentication = async (req, h) => {
     validator.validateAddAuthenticationPayload(req.payload)
 
-    const id = await userServices.verifyUserCredential(
+    const id = await userServices.verifyCredential(
       req.payload.username,
       req.payload.password
     )
     const accessToken = tokenManager.generateAccessToken({ id })
     const refreshToken = tokenManager.generateRefreshToken({ id })
+
     await authenticationServices.addRefreshToken(refreshToken)
 
     return h

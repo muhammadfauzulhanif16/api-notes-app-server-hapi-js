@@ -51,7 +51,7 @@ exports.NoteHandlers = (services, validator) => {
   }
 
   const deleteNoteById = async (req) => {
-    await services.verifyNoteOwner(req.params.id, req.auth.credentials.id)
+    await services.verifyOwner(req.params.id, req.auth.credentials.id)
     await services.deleteNoteById(req.params.id)
 
     return {
