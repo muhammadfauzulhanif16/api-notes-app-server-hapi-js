@@ -1,7 +1,6 @@
 require('dotenv').config()
 const Hapi = require('@hapi/hapi')
 const Jwt = require('@hapi/jwt')
-const path = require('path')
 const Inert = require('@hapi/inert')
 
 const {
@@ -26,17 +25,19 @@ const {
   CollaborationServices,
   UserServices,
   ProducerServices,
-  StorageServices
+  StorageServices,
+  CacheServices
 } = require('./services')
 
 const { TokenManager } = require('./tokenize/TokenManager')
 const { ClientError } = require('./exceptions')
 
 const init = async () => {
+  const cacheServices = CacheServices()
   const userServices = UserServices()
   const authenticationServices = AuthenticationServices()
-  const collaborationServices = CollaborationServices()
-  const noteServices = NoteServices(collaborationServices)
+  const collaborationServices = CollaborationServices(cacheServices)
+  const noteServices = NoteServices(collaborationServices, cacheServices)
   const storageServices = StorageServices()
 
   const server = Hapi.server({

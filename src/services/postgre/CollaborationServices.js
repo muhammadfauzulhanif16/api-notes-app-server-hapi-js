@@ -2,7 +2,7 @@ const { Pool } = require('pg')
 const uuid = require('uuid')
 const { InvariantError } = require('../../exceptions')
 
-exports.CollaborationServices = () => {
+exports.CollaborationServices = (cacheServices) => {
   const addCollaboration = async (noteId, userId) => {
     const id = uuid.v4()
 
@@ -15,6 +15,7 @@ exports.CollaborationServices = () => {
       throw new InvariantError('Kolaborasi gagal ditambahkan')
     }
 
+    await cacheServices.deleteCache(`notes:${userId}`)
     return result.rows[0].id
   }
 
@@ -27,6 +28,8 @@ exports.CollaborationServices = () => {
     if (!result.rowCount) {
       throw new InvariantError('Kolaborasi gagal dihapus')
     }
+
+    await cacheServices.deleteCache(`notes:${userId}`)
   }
 
   const verifyCollaborator = async (noteId, userId) => {

@@ -4,6 +4,7 @@ const { UserServices } = require('./postgre/UserServices')
 const { NoteServices } = require('./postgre/NoteServices')
 const { ProducerServices } = require('./rabbitmq/ProducerServices')
 const { StorageServices } = require('./s3/StorageServices')
+const { CacheServices } = require('./redis/CacheServices')
 
 module.exports = {
   AuthenticationServices,
@@ -11,5 +12,6 @@ module.exports = {
   UserServices,
   NoteServices,
   ProducerServices,
-  StorageServices
+  StorageServices,
+  CacheServices
 }

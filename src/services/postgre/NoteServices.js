@@ -7,7 +7,7 @@ const {
   AuthorizationError
 } = require('../../exceptions')
 
-exports.NoteServices = (collaborationServices) => {
+exports.NoteServices = (collaborationServices, cacheServices) => {
   const addNote = async ({ title, body, tags }, owner) => {
     const id = uuid.v4()
     const createdAt = new Date()
@@ -21,16 +21,27 @@ exports.NoteServices = (collaborationServices) => {
       throw new InvariantError('Catatan gagal ditambahkan')
     }
 
+    await cacheServices.deleteCache(`notes:${owner}`)
+
     return result.rows[0].id
   }
 
   const getNotes = async (owner) => {
-    const result = await new Pool().query(
-      'SELECT notes.* FROM notes LEFT JOIN collaborations ON collaborations.note_id = notes.id WHERE notes.owner = $1 OR collaborations.user_id = $1 GROUP BY notes.id',
-      [owner]
-    )
+    try {
+      return JSON.parse(await cacheServices.getCache(`notes:${owner}`))
+    } catch (e) {
+      const result = await new Pool().query(
+        'SELECT notes.* FROM notes LEFT JOIN collaborations ON collaborations.note_id = notes.id WHERE notes.owner = $1 OR collaborations.user_id = $1 GROUP BY notes.id',
+        [owner]
+      )
 
-    return result.rows.map(mapDBToNoteModel)
+      await cacheServices.setCache(
+        `notes:${owner}`,
+        JSON.stringify(result.rows.map(mapDBToNoteModel))
+      )
+
+      return result.rows.map(mapDBToNoteModel)
+    }
   }
 
   const getNoteById = async (id) => {
@@ -55,6 +66,8 @@ exports.NoteServices = (collaborationServices) => {
     if (!result.rowCount) {
       throw new NotFoundError('Gagal memperbarui catatan. Id tidak ditemukan')
     }
+
+    await cacheServices.deleteCache(`notes:${result.rows[0].owner}`)
   }
 
   const deleteNoteById = async (id) => {
