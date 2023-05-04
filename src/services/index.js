@@ -3,7 +3,7 @@ const { CollaborationServices } = require('./postgre/CollaborationServices')
 const { UserServices } = require('./postgre/UserServices')
 const { NoteServices } = require('./postgre/NoteServices')
 const { ProducerServices } = require('./rabbitmq/ProducerServices')
-const { StorageServices } = require('./storage/StorageServices')
+const { StorageServices } = require('./s3/StorageServices')
 
 module.exports = {
   AuthenticationServices,
