@@ -1,21 +1,32 @@
 require('dotenv').config()
 const Hapi = require('@hapi/hapi')
 const Jwt = require('@hapi/jwt')
+const path = require('path')
+const Inert = require('@hapi/inert')
 
-const { Note, User, Collaboration, Authentication, Export } = require('./api')
+const {
+  Note,
+  User,
+  Collaboration,
+  Authentication,
+  Export,
+  Upload
+} = require('./api')
 const {
   NoteValidator,
   UserValidator,
   AuthenticationValidator,
   CollaborationValidator,
-  ExportValidator
+  ExportValidator,
+  UploadValidator
 } = require('./validator')
 const {
   NoteServices,
   AuthenticationServices,
   CollaborationServices,
   UserServices,
-  ProducerServices
+  ProducerServices,
+  StorageServices
 } = require('./services')
 
 const { TokenManager } = require('./tokenize/TokenManager')
@@ -26,6 +37,9 @@ const init = async () => {
   const authenticationServices = AuthenticationServices()
   const collaborationServices = CollaborationServices()
   const noteServices = NoteServices(collaborationServices)
+  const storageServices = StorageServices(
+    path.resolve(__dirname, 'api/upload/file/images')
+  )
 
   const server = Hapi.server({
     port: process.env.PORT,
@@ -40,6 +54,9 @@ const init = async () => {
   await server.register([
     {
       plugin: Jwt.plugin
+    },
+    {
+      plugin: Inert.plugin
     }
   ])
 
@@ -96,6 +113,13 @@ const init = async () => {
       options: {
         services: ProducerServices,
         validator: ExportValidator
+      }
+    },
+    {
+      plugin: Upload,
+      options: {
+        services: storageServices,
+        validator: UploadValidator
       }
     }
   ])
